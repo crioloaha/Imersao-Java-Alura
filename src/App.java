@@ -1,5 +1,8 @@
-import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.net.URI;
+import java.net.URL;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
@@ -7,50 +10,71 @@ import java.net.http.HttpResponse.BodyHandlers;
 import java.util.List;
 import java.util.Map;
 
-import javax.imageio.ImageIO;
-
 public class App {
     public static void main(String[] args) throws Exception {
 
-        // fazer uma conexao HTTP e buscar os TOP 250 filmes
-
+        // fazer uma conexão HTTP e buscar os top 10 filmes de acordo com IMDB
         String url = "https://raw.githubusercontent.com/alura-cursos/imersao-java-2-api/main/TopMovies.json";
+        String IMDB_KEY = System.getenv("IMDB_KEY");
+        System.out.println(IMDB_KEY);
+
+        // String url = "https://imdb-api.com/en/API/TopTVs/" + IMBD_KEY;  (API da imdb com instabilidade, usando arquivo pronto disponibilizado pela Alura)
+        
         URI endereco = URI.create(url);
         var client = HttpClient.newHttpClient();
         var request = HttpRequest.newBuilder(endereco).GET().build();
         HttpResponse<String> response = client.send(request, BodyHandlers.ofString());
         String body = response.body();
-        System.out.println(body);
 
-        // extrair (parciar) os dados que interessam (título, poster, classificação)
+        // extrair só os dados que interessam (titulo, poster, classificação)
         var parser = new JsonParser();
-        List<Map<String,String>> listaDeFilmes = parser.parse(body);
+        List<Map<String, String>> listaDeSeries = parser.parse(body);
 
-        // exibir e manipular os dados
-        for (Map<String,String> movie: listaDeFilmes) {
-            System.out.println("\u001b[1m\u001b[40mRank: " + movie.get("rank") + " \u001b[m");
-            System.out.println("\u001b[1mTítulo:\u001b[m " + movie.get("title"));
-            System.out.println("\u001b[1mBanner URL:\u001b[m " + movie.get("image"));
-            System.out.println("\u001b[1mAvaliação:\u001b[m " + movie.get("imDbRating"));
-            double rating = Double.parseDouble(movie.get("imDbRating"));
+        // exibir e manipular os dados 
+        var gerador = new CriadorDeFigurinhas();
+
+        var diretorio = new File("saida/");
+        diretorio.mkdir();
+
+        for (int i = 0; i < 10; i++) {
+            Map<String,String> serie = listaDeSeries.get(i);
+
+            String urlImage = serie.get("image");
+            String titulo = serie.get("title");
+
+            InputStream inputStream = new URL(urlImage).openStream();
+            String nomeArquivo = titulo + ".png";      
+
+           
+            System.out.println("\u001b[37;1mTitulo:\u001b[44m " + serie.get("title") + " \u001b[0m");
+            System.out.println("\u001b[37;1mPoster:" + " \u001b[0m" + serie.get("image"));
+            double imDbRating = Double.parseDouble(serie.get("imDbRating"));
+            System.out.println(imDbRating);
+            double rating = Double.parseDouble(serie.get("imDbRating"));
             int starNumber = (int) rating;
-            for(int n = 1; n <= starNumber; n++){
-                System.out.print("🌟");
-            }
-            if (rating > 9) {
-                System.out.print("  Mais bem avaliado \uD83D\uDC4F");
-            }
-            System.out.println("\n");
+                    for(int n = 1; n <= starNumber; n++){
+                        System.out.print("🌟");
+                    }
+                    if (rating > 9) {
+                    System.out.print(" Mais bem avaliado \uD83D\uDC4F");
+                    }
+                System.out.println("\n");
+                
+            
+            String texto;
+            
+            InputStream selo;
+                if (imDbRating >= 8.5 ){
+                    texto = "filme recomendado";
+                    selo = new FileInputStream("selos/aprovado.png");
+                }else{
+                    texto = "não recomendado";
+                    selo = new FileInputStream("selos/reprovado.png");
+                }
+            String classificacao = "classificacao";
+            gerador.Criar(inputStream, "saida/" + nomeArquivo, texto, selo, classificacao);
 
-            // Imprime a imagem
-            String capaUrl = movie.get("image");
-            if (capaUrl != null && !capaUrl.isEmpty()) {
-                System.out.println("Imagem da capa:");
-                URI capaUri = URI.create(capaUrl);
-                BufferedImage img = ImageIO.read(capaUri.toURL());
-                System.out.println(img);
-            }
-        }
-        
+          
+        } 
     }
 }
