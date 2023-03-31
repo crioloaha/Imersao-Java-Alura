@@ -43,25 +43,25 @@ Desafios:
 2 - Centralizando o texto na nova imagem.
 
     // Texto + medidas
-   FontMetrics fontMetrics = graphics.getFontMetrics();
-   Rectangle2D retangulo = fontMetrics.getStringBounds(texto, graphics);
-   int alturaTexto = (int)retangulo.getHeight();
-   int larguraTexto = (int)retangulo.getWidth();
+           FontMetrics fontMetrics = graphics.getFontMetrics();
+           Rectangle2D retangulo = fontMetrics.getStringBounds(texto, graphics);
+           int alturaTexto = (int)retangulo.getHeight();
+           int larguraTexto = (int)retangulo.getWidth();
 
     // Posição do texto em X e Y.
-    int posXTexto = seloImage.getWidth() + 30; // posição X do texto começa320 pixels à direita da imagem selo
-    int posYTexto = seloImageY + seloImage.getHeight() / 2 + alturaTexto + -150; // posição Y do texto centralizada em relação à imagem selo
-    posXTexto = posXTexto - larguraTexto / 2; // centralizar o texto em relação à imagem selo            
-              
+            int posXTexto = seloImage.getWidth() + 30; // posição X do texto começa320 pixels à direita da imagem selo
+            int posYTexto = seloImageY + seloImage.getHeight() / 2 + alturaTexto + -150; // posição Y do texto centralizada em relação à imagem selo
+            posXTexto = posXTexto - larguraTexto / 2;           
+
     // Desenhando o texto na nova imagem.
-      graphics.drawString(texto, posXTexto, posYTexto);
+             graphics.drawString(texto, posXTexto, posYTexto);
     
 3 - Alterando a fonte para uma pre-instalada no windows.
 
     // nova fonte
-    var fonte = new Font("Impact", Font.BOLD, 80);
-    graphics.setFont(fonte);
-    graphics.setColor(corTexto);
+            var fonte = new Font("Impact", Font.BOLD, 80);
+            graphics.setFont(fonte);
+            graphics.setColor(corTexto);
     
 4 - Desenhando contorno no texto.
 
