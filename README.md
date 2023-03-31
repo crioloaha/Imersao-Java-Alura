@@ -65,7 +65,7 @@ Desafios:
     
 4 - Desenhando contorno no texto.
 
-// Definindo estilo do contorno.
+        // Definindo estilo do contorno.
                 FontRenderContext fontRenderContext = graphics.getFontRenderContext();
                 var textLayout = new TextLayout(texto, fonte, fontRenderContext);
 
@@ -101,10 +101,10 @@ Desafios:
               gerador.Criar(inputStream, "saida/" + nomeArquivo, texto, selo, classificacao);
     
     // Metodo Criar() recebendo o texto.
-    public void Criar(InputStream inputStream, String nomeArquivo, String texto, InputStream selo, String classificacao) throws Exception{
+             public void Criar(InputStream inputStream, String nomeArquivo, String texto, InputStream selo, String classificacao) throws Exception{
 
     // Colocando sobreposição da imagem.
-     if (imDbRating >= 8.5 ){
+                 if (imDbRating >= 8.5 ){
                     texto = "filme recomendado";
                     selo = new FileInputStream("selos/aprovado.png");
                 }else{
@@ -113,12 +113,12 @@ Desafios:
                 }
 
     // Desenhando a sobreposição.
-   BufferedImage imgOriginal = ImageIO.read(inputStream);
-   BufferedImage seloImage = ImageIO.read(selo);
+               BufferedImage imgOriginal = ImageIO.read(inputStream);
+               BufferedImage seloImage = ImageIO.read(selo);
 
-    Graphics2D graphics = (Graphics2D)novaImagen.getGraphics();
-    graphics.drawImage(imgOriginal, 0, 0, null);
+                Graphics2D graphics = (Graphics2D)novaImagen.getGraphics();
+                graphics.drawImage(imgOriginal, 0, 0, null);
 
-    graphics.drawImage(imgOriginal, 0, 0, null);
+                graphics.drawImage(imgOriginal, 0, 0, null);
 
 
