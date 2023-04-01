@@ -1,27 +1,131 @@
 ## Imersão JAVA
 
-Projeto imergido através da Alura - que é uma plataforma de tecnologia voltado para o mercado de trabalho. Foi composto por buscar listas de melhores filmes e series na API , Extrair os dados e Mostrar na saída
+## Aula 3
 
+Refatorando o App, transferindo parte do código em novas classes.
 
-## Folder Structure
+Novas classes criada para:
+ - Conteudo
+ - ClienteHttp
 
-The workspace contains two folders by default, where:
+Criando uma interface para as novas classes extratoras:
+ - ExtratorConteudoIMDB
+ - ExtratorConteudoNasa
+ 
+## Modificado da Aula 2
+1 - Criado a classe ClienteHttp, alteramos todo o código que buscava os dados em .json para im objeto do tipo ClienteHttp.
 
-- `src`: the folder to maintain sources
-- `lib`: the folder to maintain dependencies
+      // var http = new ClienteHttp();
+         String json = http.buscaDados(url);
+         
+2 - O mesmo para os ExtratorConteudo.
 
-Meanwhile, the compiled output files will be generated in the `bin` folder by default.
+         // fazer uma conexão HTTP e buscar os top 3 Séries de acordo com IMDB
+         String API_KEY = System.getenv("API_KEY");
+         System.out.println(API_KEY);
 
-> If you want to customize the folder structure, open `.vscode/settings.json` and update the related settings there.
+         // String url = "https://raw.githubusercontent.com/alura-cursos/imersao-java-2-api/main/MostPopularTVs.json";
+         // ExtratorConteudo extrator = new ExtratorConteudoIMDB();
 
-## Aula 1
-Desafios:
-1. Consumir o endpoint de filmes mais populares da API do IMDB. Procure também, na documentação da API do IMDB, o endpoint que retorna as melhores séries e o que retorna as séries mais populares.
+         String url = "https://api.nasa.gov/planetary/apod?api_key=" + API_KEY + "&start_date=2022-07-4&end_date=2022-07-10";
+         ExtratorConteudo extrator = new ExtratorConteudoNasa();
+         
+3 - Criação de uma lista de conteudos
 
-2. Usar a criatividade para deixar a saída dos dados mais bonitinha: usar emojis com código UTF-8, mostrar a nota do filme como estrelinhas, decorar o terminal com cores, negrito e itálico usando códigos ANSI, e mais!
+        // List<Conteudo> conteudos = extrator.extrairConteudos(json);
 
-3. Colocar a chave da API do IMDB em algum lugar fora do código como um arquivo de configuração (p. ex, um arquivo .properties) ou uma variável de ambiente. 
+4 -No looping que gera as imagens pegamos cada conteudo da lista, chamando suas propriedades pelos metodos .getTitulo() e .getUrlImage()
 
-## API Application Programming Interface (Interface de Programação de Aplicação)
-APIs são mecanismos que permitem que dois componentes de software se comuniquem usando um conjunto de definições e protocolos. Por exemplo, o sistema de software do instituto meteorológico contém dados meteorológicos diários. A aplicação para a previsão do tempo em seu telefone “fala” com esse sistema por meio de APIs e mostra atualizações meteorológicas diárias no telefone. 
+        // for (int i = 0; i < 3; i++) {
 
+             Conteudo conteudo = conteudos.get(i);
+
+             InputStream inputStream = new URL(conteudo.getUrlImagem()).openStream();
+             String nomeArquivo = conteudo.getTitulo();      
+
+             System.out.println("\u001b[37;1mTitulo:\u001b[44m " + conteudo.getTitulo() + " \u001b[0m");
+             System.out.println("\u001b[37;1mPoster:" + " \u001b[0m" + conteudo.getUrlImagem());
+
+             gerador.Criar(inputStream, nomeArquivo);
+
+             System.out.println("\n");
+         }
+         
+         
+Algumas modificações do Gerador de Figurinhas
+1 - Retirada a sobreposição de selos("aprovado"/"reprovado").
+
+2 - Variavel "texto" subistituida pelo próprio titulo da imagem("nomeArquivo").
+      // graphics.drawString(nomeArquivo, posXTexto, posYTexto);
+      
+3 - Diretório de saida e formato da imagem definidos no ImageIO.write().
+      // ImageIO.write(novaImagen, "png", new File("saida/" + nomeArquivo + ".png"));
+
+## Desafios Aula 3
+1 - Transformando a classe Conteudo para record.
+
+    // public record Conteudo(String titulo, String urlImagem){}
+
+Nos metodos que retornam o titulo e a url de Conteudo é retirado a expressão "get"
+
+      //.getTtitulo()
+
+      .getUurlImage()
+
+2 - Criando classe ClienteHttpException.
+
+      // public class ClienteHttpExeption extends RuntimeException{
+
+           public ClienteHttpExeption(String msg) {
+               super(msg);
+
+           }
+
+       }
+
+Alteração do ClienteHttp.
+
+        // catch(IOException | InterruptedException ex){
+             throw new ClienteHttpExeption("\nErro na consulta da URL\n(╯°□°)╯︵ ┻━┻\n");
+
+         }
+         
+3 - Utilizando .stram() e expressão lambda nos Extratores.
+
+        // public List<Conteudo> extrairConteudos(String json){
+
+ extrair só os dados que interessam (titulo, poster, classificação)
+        //   var parser = new JsonParser();
+           List<Map<String, String>> listaDeAtributos = parser.parse(json);
+
+           return listaDeAtributos.stream()
+               .map(atributos -> new Conteudo(atributos.get("title"), atributos.get("url")))
+               .toList();
+
+           }
+
+4 - Utilizando uma enum API para guardar as urls das APIs.
+
+           // public enum API {
+               IMDB_TOP_TVS("https://raw.githubusercontent.com/alura-cursos/imersao-java-2-api/main/TopMovies.json", new ExtratorConteudoIMDB()),
+               NASA_APOD("https://api.nasa.gov/planetary/apod?api_key=" + System.getenv("API_KEY") + "&start_date=2022-07-4&end_date=2022-07-10", new       ExtratorConteudoNasa()),
+               IMDB_POPULAR_TVS("https://raw.githubusercontent.com/alura-cursos/imersao-java-2-api/main/MostPopularTVs.json", new ExtratorConteudoIMDB());
+
+               private String url;
+               private ExtratorConteudo ext;
+
+               API(String url, ExtratorConteudo ext){
+                   this.url = url;
+                   this.ext = ext;
+
+               }
+
+               public String getUrl() {
+                   return url;
+               }
+
+               public ExtratorConteudo getExt() {
+                   return ext;
+               }
+
+           }
