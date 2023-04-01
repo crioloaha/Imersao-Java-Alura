@@ -56,9 +56,11 @@ Algumas modificações do Gerador de Figurinhas
 1 - Retirada a sobreposição de selos("aprovado"/"reprovado").
 
 2 - Variavel "texto" subistituida pelo próprio titulo da imagem("nomeArquivo").
+
            // graphics.drawString(nomeArquivo, posXTexto, posYTexto);
       
 3 - Diretório de saida e formato da imagem definidos no ImageIO.write().
+
           // ImageIO.write(novaImagen, "png", new File("saida/" + nomeArquivo + ".png"));
 
 ## Desafios Aula 3
@@ -95,6 +97,7 @@ Alteração do ClienteHttp.
         // public List<Conteudo> extrairConteudos(String json){
 
  extrair só os dados que interessam (titulo, poster, classificação)
+ 
         //   var parser = new JsonParser();
            List<Map<String, String>> listaDeAtributos = parser.parse(json);
 
